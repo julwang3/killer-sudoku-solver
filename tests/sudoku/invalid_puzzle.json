@@ -1,0 +1,7 @@
+{
+  "board": [
+    ["only"],
+    ["two", "rows"]
+  ],
+  "expect_solved": false
+}
