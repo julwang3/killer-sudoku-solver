@@ -6,6 +6,7 @@
 
 #include "sudoku.h"
 #include "../solver/sudoku_solver.h"
+#include "../solver/killer_sudoku_solver.h"
 
 using json = nlohmann::json;
 

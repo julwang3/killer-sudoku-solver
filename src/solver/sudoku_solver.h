@@ -18,7 +18,7 @@ public:
      */
     bool solve(std::vector<std::vector<char>> &board);
 
-private:
+protected:
     bool couldPlace(int num, int row, int col) const;
     void placeNumber(int num, int row, int col);
     void removeNumber(int num, int row, int col);
