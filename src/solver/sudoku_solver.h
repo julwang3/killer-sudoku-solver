@@ -19,9 +19,10 @@ public:
     bool solve(std::vector<std::vector<char>> &board);
 
 protected:
-    bool couldPlace(int num, int row, int col) const;
-    void placeNumber(int num, int row, int col);
-    void removeNumber(int num, int row, int col);
+    bool virtual couldPlace(int num, int row, int col) const;
+    void virtual placeNumber(int num, int row, int col);
+    void virtual removeNumber(int num, int row, int col);
+    
     bool backtrack(int row, int col);
 
     std::vector<std::vector<char>> m_board;

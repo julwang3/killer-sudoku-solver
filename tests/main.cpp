@@ -81,7 +81,10 @@ int main(int argc, char **argv)
     }
 
     std::string inputJson = readFile(inputPath);
-    std::string outputJson = solveSudokuJson(inputJson);
+
+    /* TODO: Set up dynamic testing rather than manual */
+    // std::string outputJson = solveSudokuJson(inputJson);
+    std::string outputJson = solveKillerSudokuJson(inputJson);
 
     json parsed = json::parse(outputJson); // solveSudokuJson always returns valid JSON
     writeFile(outputPath, parsed.dump(4));
