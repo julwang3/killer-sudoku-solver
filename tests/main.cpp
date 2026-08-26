@@ -41,16 +41,18 @@ void writeFile(const fs::path &path, const std::string &contents)
 }
 
 /**
- * @brief Builds the default output path for a given input path:
- *        out/results/out_<input filename>
- *        e.g. tests/test1.json -> out/results/out_test1.json
+ * @brief Builds the default output path for a given input path and mode:
+ *        out/results/out_sudoku_<input filename>   (mode == "sudoku")
+ *        out/results/out_ksudoku_<input filename>  (mode == "killer")
+ *        e.g. tests/test1.json -> out/results/out_ksudoku_test1.json
  *
  * Kept separate from out/ build artifacts (the compiled binary) so
  * solver results don't mix with build output.
  */
-fs::path defaultOutputPath(const fs::path &inputPath)
+fs::path defaultOutputPath(const fs::path &inputPath, const std::string &mode)
 {
-    return fs::path("out") / "results" / ("out_" + inputPath.filename().string());
+    std::string prefix = (mode == "killer") ? "out_ksudoku_" : "out_sudoku_";
+    return fs::path("out") / "results" / (prefix + inputPath.filename().string());
 }
 
 /**
@@ -85,7 +87,6 @@ int main(int argc, char **argv)
 
     std::string mode = argv[1];
     fs::path inputPath = argv[2];
-    fs::path outputPath = (argc > 3) ? fs::path(argv[3]) : defaultOutputPath(inputPath);
 
     if (mode != "sudoku" && mode != "killer")
     {
@@ -93,6 +94,8 @@ int main(int argc, char **argv)
         printUsage(argv[0]);
         return 1;
     }
+
+    fs::path outputPath = (argc > 3) ? fs::path(argv[3]) : defaultOutputPath(inputPath, mode);
 
     if (!fs::exists(inputPath))
     {
