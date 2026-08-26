@@ -54,25 +54,45 @@ fs::path defaultOutputPath(const fs::path &inputPath)
 }
 
 /**
+ * @brief Prints usage instructions to stderr
+ */
+void printUsage(const char *programName)
+{
+    std::cerr << "Usage: " << programName << " <sudoku|killer> <input.json> [output.json]\n";
+}
+
+/**
  * @brief Main Usage:
- *              ./test <input.json> [output.json]
+ *              ./test <sudoku|killer> <input.json> [output.json]
  *
- * Reads a puzzle from the input file, shaped like:
+ * mode "sudoku": reads a standard puzzle, shaped like:
  *      {"board": [["5","3",".",...], ... 9 rows, each 9 single-char cells]}
+ *
+ * mode "killer": reads a killer sudoku puzzle, shaped like:
+ *      {"board": [...same as above...],
+ *       "cages": [{"sum": <int>, "cells": [[row, col], ...]}, ...]}
  *
  * Solves it and writes the result to the output file (or, if omitted,
  * "out/results/out_<input filename>").
  */
 int main(int argc, char **argv)
 {
-    if (argc < 2)
+    if (argc < 3)
     {
-        std::cerr << "Usage: " << argv[0] << " <input.json> [output.json]\n";
+        printUsage(argv[0]);
         return 1;
     }
 
-    fs::path inputPath = argv[1];
-    fs::path outputPath = (argc > 2) ? fs::path(argv[2]) : defaultOutputPath(inputPath);
+    std::string mode = argv[1];
+    fs::path inputPath = argv[2];
+    fs::path outputPath = (argc > 3) ? fs::path(argv[3]) : defaultOutputPath(inputPath);
+
+    if (mode != "sudoku" && mode != "killer")
+    {
+        std::cerr << "Unknown mode: \"" << mode << "\" (expected \"sudoku\" or \"killer\")\n";
+        printUsage(argv[0]);
+        return 1;
+    }
 
     if (!fs::exists(inputPath))
     {
@@ -82,15 +102,16 @@ int main(int argc, char **argv)
 
     std::string inputJson = readFile(inputPath);
 
-    /* TODO: Set up dynamic testing rather than manual */
-    // std::string outputJson = solveSudokuJson(inputJson);
-    std::string outputJson = solveKillerSudokuJson(inputJson);
+    std::string outputJson = (mode == "sudoku")
+        ? solveSudokuJson(inputJson)
+        : solveKillerSudokuJson(inputJson);
 
-    json parsed = json::parse(outputJson); // solveSudokuJson always returns valid JSON
+    json parsed = json::parse(outputJson); // solve*Json always returns valid JSON
     writeFile(outputPath, parsed.dump(4));
 
     bool solved = parsed.value("solved", false);
-    std::cout << (solved ? "Solved" : "Not solved") << " -> " << outputPath.string() << "\n";
+    std::cout << "[" << mode << "] " << (solved ? "Solved" : "Not solved")
+              << " -> " << outputPath.string() << "\n";
 
     return solved ? 0 : 1;
 }
