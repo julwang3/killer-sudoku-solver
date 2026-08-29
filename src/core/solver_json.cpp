@@ -193,7 +193,7 @@ std::string solveSudokuJson(const std::string &inputJson)
     }
 
     // Define input board
-    std::vector<std::vector<char>> board(9);
+    std::vector<std::vector<char>> board;
     if (!parseBoard(board, input, output))
         return output.dump();
 
