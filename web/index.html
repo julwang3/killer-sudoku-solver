@@ -1,63 +1,80 @@
+<!-- Scripted using Claude Sonnet 5 -->
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Sudoku Solver</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
-    textarea { width: 100%; height: 160px; font-family: monospace; font-size: 13px; }
-    button { margin-top: 8px; padding: 8px 16px; font-size: 14px; }
-    pre { background: #f5f5f5; padding: 12px; border-radius: 6px; white-space: pre-wrap; }
-    #status { font-size: 13px; color: #666; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sudoku Solver</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Sudoku Solver</h1>
-  <p id="status">Loading module...</p>
+<div class="page">
 
-  <textarea id="input">{
-  "board": [
-    ["5","3",".",".","7",".",".",".","."],
-    ["6",".",".","1","9","5",".",".","."],
-    [".","9","8",".",".",".",".","6","."],
-    ["8",".",".",".","6",".",".",".","3"],
-    ["4",".",".","8",".","3",".",".","1"],
-    ["7",".",".",".","2",".",".",".","6"],
-    [".","6",".",".",".",".","2","8","."],
-    [".",".",".","4","1","9",".",".","5"],
-    [".",".",".",".","8",".",".","7","9"]
-  ]
-}</textarea>
-  <br>
-  <button id="solve" disabled>Solve</button>
+  <header>
+    <h1>Sudoku Solver</h1>
+    <div class="mode-switch">
+      <div class="seg-control" id="seg-control" data-mode="sudoku" role="tablist" aria-label="Puzzle mode">
+        <div class="seg-highlight" id="seg-highlight"></div>
+        <button class="seg-btn" id="label-sudoku" role="tab" aria-selected="true">Standard</button>
+        <button class="seg-btn" id="label-killer" role="tab" aria-selected="false">Killer</button>
+      </div>
+    </div>
+  </header>
 
-  <h3>Output</h3>
-  <pre id="output">(nothing yet)</pre>
+  <div class="layout">
 
-  <script src="build/logic.js"></script>
-  <script>
-    const statusEl = document.getElementById("status");
-    const button = document.getElementById("solve");
-    const inputEl = document.getElementById("input");
-    const outputEl = document.getElementById("output");
+    <div class="board-wrap">
+      <div class="board" id="board"></div>  <!-- Board is created in JS (see lines 136-176) -->
+      <p class="status" id="status"></p>
+    </div>
 
-    createModule().then((Module) => {
-      statusEl.textContent = "Module loaded — ready.";
-      button.disabled = false;
+    <div class="sidebar">
+      <div class="panel">
+        <h2>Puzzle</h2>
+        <div class="numpad" id="numpad">
+          <button class="btn numpad-btn" data-digit="1">1</button>
+          <button class="btn numpad-btn" data-digit="2">2</button>
+          <button class="btn numpad-btn" data-digit="3">3</button>
+          <button class="btn numpad-btn" data-digit="4">4</button>
+          <button class="btn numpad-btn" data-digit="5">5</button>
+          <button class="btn numpad-btn" data-digit="6">6</button>
+          <button class="btn numpad-btn" data-digit="7">7</button>
+          <button class="btn numpad-btn" data-digit="8">8</button>
+          <button class="btn numpad-btn" data-digit="9">9</button>
+          <button class="btn numpad-btn erase" id="erase-btn" data-digit=".">Erase</button>
+        </div>
+        <div class="stack">
+          <button class="btn primary full" id="solve-btn">Solve</button>
+          <button class="btn full" id="clear-btn">Clear Board</button>
+        </div>
+      </div>
 
-      button.addEventListener("click", () => {
-        try {
-          const inputJson = inputEl.value;
-          const resultJson = Module.solveSudoku(inputJson);
-          const result = JSON.parse(resultJson);
-          outputEl.textContent = JSON.stringify(result, null, 2);
-        } catch (e) {
-          outputEl.textContent = "Error: " + e;
-        }
-      });
-    }).catch((e) => {
-      statusEl.textContent = "Failed to load module: " + e;
-    });
-  </script>
+      <div class="panel" id="killer-panel" style="display:none;">
+        <h2>Cages</h2>
+        <p class="hint">Every cell needs a cage. Turn on the cage tool, click cells to group them, then set the sum.</p>
+        <button class="btn full" id="cage-tool-btn">Cage Tool: Off</button>
+
+        <div class="cage-builder" id="cage-builder">
+          <p class="hint" id="builder-count">0 cells selected</p>
+          <div class="field-row">
+            <input type="number" id="cage-sum-input" min="1" max="45" placeholder="Sum">
+            <button class="btn" id="confirm-cage-btn">Add Cage</button>
+            <button class="btn" id="cancel-cage-btn">Clear</button>
+          </div>
+        </div>
+
+        <ul class="cage-list" id="cage-list"></ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="build/logic.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
